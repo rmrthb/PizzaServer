@@ -25,7 +25,9 @@ namespace PizzaServerDemo.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PizzaOrder>>> GetPizzaOrder()
         {
-            return await _context.PizzaOrder.ToListAsync();
+            var pOrder = await _context.PizzaOrder.Select(po =>
+            new {po.OrderID, po.PizzaID}).ToListAsync();
+            return Ok(pOrder);
         }
 
         // GET: api/PizzaOrders/5

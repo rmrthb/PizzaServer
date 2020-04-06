@@ -27,7 +27,10 @@ namespace PizzaServerDemo.Controllers
         {
             //var products = await _context.Product.Include(c => c.category).Where(c => c.categoryId == categoryId).ToListAsync();
 
-            return await _context.Pizza.ToListAsync();
+            //return await _context.Pizza.ToListAsync();
+            var pizzas = await _context.Pizza.Select(p =>
+            new { p.PizzaID, p.PizzaName, p.PizzaPrice }).ToListAsync();
+            return Ok(pizzas);
         }
 
         // GET: api/Pizzas/5
