@@ -34,11 +34,16 @@ namespace PizzaServerDemo.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
-            var order = await _context.Order.Include(po => po.PizzaOrders)
-            .ThenInclude(o => o.Order)
-            .Select(s => new { s.OrderID, s.TotalCost, order = s.PizzaOrders.Select(o => new { o.Pizza.PizzaName, o.Pizza.PizzaPrice }) })
-            .ToListAsync();
+            var order = await _context.Order
+                .Select(s => new
+                {
+                    s.OrderID,
+                    s.TotalCost,
+                    order = s.PizzaOrders
+                .Select(o => new { o.Pizza.PizzaName, o.Pizza.PizzaPrice })
+                }).Where(x => x.OrderID == id).FirstOrDefaultAsync();
 
+            
             if (order == null)
             {
                 return NotFound();
