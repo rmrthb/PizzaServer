@@ -43,7 +43,6 @@ namespace PizzaServerDemo.Controllers
                 .Select(o => new { o.Pizza.PizzaName, o.Pizza.PizzaPrice })
                 }).Where(x => x.OrderID == id).FirstOrDefaultAsync();
 
-            
             if (order == null)
             {
                 return NotFound();

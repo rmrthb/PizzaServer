@@ -25,9 +25,6 @@ namespace PizzaServerDemo.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Pizza>>> GetPizza()
         {
-            //var products = await _context.Product.Include(c => c.category).Where(c => c.categoryId == categoryId).ToListAsync();
-
-            //return await _context.Pizza.ToListAsync();
             var pizzas = await _context.Pizza.Select(p =>
             new { p.PizzaID, p.PizzaName, p.PizzaPrice }).ToListAsync();
             return Ok(pizzas);
@@ -37,15 +34,33 @@ namespace PizzaServerDemo.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Pizza>> GetPizza(int id)
         {
+            //Saved old linq queries
             //var pizza = await _context.Pizza.Include(p => p.PizzaOrders).Where(p => p.PizzaID == id).FindAsync(id);
 
             //var pizza = await _context.Pizza.FindAsync(id);
             //var pizza = await _context.Pizza.Include(p => p.PizzaOrders).Where(p => p.PizzaID == id).FirstOrDefaultAsync();
             //LÖSNINGEN
+            //var pizza = await _context.Pizza.Include(po => po.PizzaOrders)
+            //.ThenInclude(o => o.Order)
+            //.Select(s => new { s.PizzaID, s.PizzaName, order = s.PizzaOrders.Select(o => new { o.Order.OrderID, o.Order.TotalCost, o.Order.PizzaOrders
+            //}) })
+            //.Where(x => x.PizzaID == id).FirstOrDefaultAsync();
+
             var pizza = await _context.Pizza.Include(po => po.PizzaOrders)
             .ThenInclude(o => o.Order)
-            .Select(s => new { s.PizzaID, s.PizzaName, order = s.PizzaOrders.Select(o => new { o.Order.OrderID, o.Order.TotalCost, o.Order.PizzaOrders }) })
-            .ToListAsync();
+            .Select(s => new
+            {
+                s.PizzaID,
+                s.PizzaName,
+                s.PizzaPrice,
+                order = s.PizzaOrders.Select(o => new
+                {
+                    o.Order.OrderID,
+                    o.Order.TotalCost,
+                    o.Order.PizzaOrders
+                })
+            })
+            .Where(x => x.PizzaID == id).FirstOrDefaultAsync();
 
             if (pizza == null)
             {
